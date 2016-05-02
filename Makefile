@@ -1,7 +1,7 @@
 .PHONY: run clean asm cpp
 
 CC = g++
-CFILES := 9_A_relation_pemutation.cpp
+CFILES := halmitonian_tour/sekanina.cpp
 #CFLAGS :=
 CFLAGS := -Wall -Werror
 

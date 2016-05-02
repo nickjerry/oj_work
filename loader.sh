@@ -1,4 +1,5 @@
 #/bin/bash
 
-echo "load file(s):$*"
-sed -i "s/CFILES := [^$]\+$/CFILES := $*/g" Makefile
+files=`echo "$*" | sed 's/\//\\\\\//g'`
+echo "load file(s):$files"
+sed -i "s/CFILES :=.*$/CFILES := $files/g" Makefile
