@@ -151,8 +151,6 @@ bool pm_vis[MAXN];
 void make_perfect_match()
 {
 	make_odd();
-	printf("odd graph : \n");
-	odd.print();
 	memset(pm_vis, 0, sizeof(pm_vis));
 	sort(&odd.e[0], &odd.e[odd.pe], cmp);
 
@@ -166,7 +164,6 @@ void make_perfect_match()
 			pm_vis[odd.e[i].to] = true;
 		}
 	}
-	mintree.print();
 }
 
 /* code for perfectmatching */
@@ -274,17 +271,9 @@ int main()
 		}
 
 		make_mintree();
-		mintree.print();
 		make_perfect_match();
 		make_euler_tour();
 		output_path();
-
-		printf("euler path: ");
-		for(i = 0; i < pathtop; i++)
-		{
-			printf("%d ", eulerpath[i]);
-		}
-		printf("\n\n");
 	}
 	return 0;
 }

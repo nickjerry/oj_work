@@ -1,7 +1,7 @@
 .PHONY: run clean asm cpp submit
 
 CC = g++
-CFILES := halmitonian_tour/sekanina.cpp
+CFILES := halmitonian_tour/christofides.cpp
 #CFLAGS :=
 CFLAGS := -Wall -Werror
 

@@ -29,39 +29,45 @@ public:
 	void del(int u, int v)
 	{
 		int i, prev = head[u];
-		if(e[prev].to == v)
+		if(head[u] != -1)
 		{
-			head[u] = e[prev].next;
-			if(e[prev].next == -1)
-				head[u] = -1;
-		}
-		for(i = e[prev].next; i != -1; i = e[i].next)
-		{
-			if(e[i].to == v)
+			if(e[prev].to == v)
 			{
-				e[prev].next = e[i].next;
-				e[i].next = -1;
-				break;
+				head[u] = e[prev].next;
+				if(e[prev].next == -1)
+					head[u] = -1;
 			}
-			prev = i;
+			for(i = e[prev].next; i != -1; i = e[i].next)
+			{
+				if(e[i].to == v)
+				{
+					e[prev].next = e[i].next;
+					e[i].next = -1;
+					break;
+				}
+				prev = i;
+			}
 		}
 
-		prev = head[v];
-		if(e[prev].to == u)
+		if(head[v] != -1)
 		{
-			head[v] = e[prev].next;
-			if(e[prev].next == -1)
-				head[v] = -1;
-		}
-		for(i = e[head[v]].next; i != -1; i = e[i].next)
-		{
-			if(e[i].to == u)
+			prev = head[v];
+			if(e[prev].to == u)
 			{
-				e[prev].next = e[i].next;
-				e[i].next = -1;
-				break;
+				head[v] = e[prev].next;
+				if(e[prev].next == -1)
+					head[v] = -1;
 			}
-			prev = i;
+			for(i = e[head[v]].next; i != -1; i = e[i].next)
+			{
+				if(e[i].to == u)
+				{
+					e[prev].next = e[i].next;
+					e[i].next = -1;
+					break;
+				}
+				prev = i;
+			}
 		}
 	}
 
@@ -175,7 +181,6 @@ void brother_tree_bfs()
 void make_brother_tree()
 {
 	brother_tree_bfs();
-	brother_tree.print();
 }
 
 /* code for generate brother tree */
@@ -193,7 +198,6 @@ void make_recursive(int s)
 	int i, left, leftson, right = s;
 	left = leftson = brother_tree.e[brother_tree.head[s]].to;
 
-	printf("[%d, %d, %d, %d] ", s, right, left, leftson);
 	for(i = brother_tree.head[left]; i != -1; i = brother_tree.e[i].next)
 	{
 		int v = brother_tree.e[i].to;
@@ -207,20 +211,16 @@ void make_recursive(int s)
 		}
 	}
 
-	printf("[%d, %d, %d, %d]\n", s, right, left, leftson);
 	brother_tree.del(s, left);
 	brother_tree.del(left, right);
 	if(s != right)
 		brother_tree.add(s, right, 1);
-	brother_tree.print();
 	make_recursive(left);
 	make_recursive(s);
 	hamilpath.del(s, right);
 	hamilpath.del(left, leftson);
 	hamilpath.add(left, s, 1);
 	hamilpath.add(leftson, right, 1);
-	printf("[%d, %d, %d, %d]\n", s, right, left, leftson);
-	hamilpath.print();
 }
 
 void make_hamilpath()
@@ -231,6 +231,23 @@ void make_hamilpath()
 
 /* code for hamiltonian tour in T3 */
 
+void show_path(int s)
+{
+	int i, u = s;
+	printf("%d ", s);
+	for(i = hamilpath.head[u]; i != -1; i = hamilpath.e[i].next)
+	{
+		int v = hamilpath.e[i].to;
+		if(d[v] == -1)
+		{
+			d[v] = 0;
+			show_path(v);
+			break;
+		}
+	}
+}
+
+
 /* code for input , output and init */
 
 void init()
@@ -238,6 +255,7 @@ void init()
 	cg.clear();
 	mintree.clear();
 	brother_tree.clear();
+	hamilpath.clear();
 	memset(adj, 0, sizeof(adj));
 	int i;
 	for(i = 0; i < n; i++)
@@ -264,8 +282,11 @@ int main()
 		}
 
 		make_mintree();
-		mintree.print();
 		make_hamilpath();
+		memset(d, -1, sizeof(d));
+		d[0] = 0;
+		show_path(0);
+		printf("0\n");
 	}
 	return 0;
 }
