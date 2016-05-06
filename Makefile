@@ -30,7 +30,4 @@ asm:$(TAR)
 submit:
 	git add . -A
 	git commit -m "backup point" --allow-empty
-	git reset --soft 838f612f9c55fec16aa42c01041ca80dd68aa587
-	git push -f
-	git commit -m "backup point" --allow-empty
 	git push

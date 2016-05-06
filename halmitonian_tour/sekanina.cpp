@@ -30,7 +30,11 @@ public:
 	{
 		int i, prev = head[u];
 		if(e[prev].to == v)
+		{
 			head[u] = e[prev].next;
+			if(e[prev].next == -1)
+				head[u] = -1;
+		}
 		for(i = e[prev].next; i != -1; i = e[i].next)
 		{
 			if(e[i].to == v)
@@ -44,7 +48,11 @@ public:
 
 		prev = head[v];
 		if(e[prev].to == u)
+		{
 			head[v] = e[prev].next;
+			if(e[prev].next == -1)
+				head[v] = -1;
+		}
 		for(i = e[head[v]].next; i != -1; i = e[i].next)
 		{
 			if(e[i].to == u)
@@ -176,6 +184,7 @@ void make_brother_tree()
 
 graph hamilpath;
 
+
 void make_recursive(int s)
 {
 	if(brother_tree.head[s] == -1)
@@ -184,36 +193,40 @@ void make_recursive(int s)
 	int i, left, leftson, right = s;
 	left = leftson = brother_tree.e[brother_tree.head[s]].to;
 
-	for(i = brother_tree.head[s]; i != -1; i = brother_tree.e[i].next)
+	printf("[%d, %d, %d, %d] ", s, right, left, leftson);
+	for(i = brother_tree.head[left]; i != -1; i = brother_tree.e[i].next)
 	{
-		if(d[i] == d[left])
+		int v = brother_tree.e[i].to;
+		if(d[v] == d[left])
 		{
-			right = i;
+			right = v;
 		}
-		if(d[i] == d[left] + 1)
+		if(d[v] == d[left] + 1)
 		{
-			leftson = i;
+			leftson = v;
 		}
 	}
 
-	printf("[%d, %d, %d, %d] ", s, right, left, leftson);
-	return;
+	printf("[%d, %d, %d, %d]\n", s, right, left, leftson);
 	brother_tree.del(s, left);
 	brother_tree.del(left, right);
-	brother_tree.add(s, right, 1);
+	if(s != right)
+		brother_tree.add(s, right, 1);
+	brother_tree.print();
 	make_recursive(left);
 	make_recursive(s);
 	hamilpath.del(s, right);
 	hamilpath.del(left, leftson);
 	hamilpath.add(left, s, 1);
 	hamilpath.add(leftson, right, 1);
+	printf("[%d, %d, %d, %d]\n", s, right, left, leftson);
+	hamilpath.print();
 }
 
 void make_hamilpath()
 {
 	make_brother_tree();
 	make_recursive(0);
-	hamilpath.print();
 }
 
 /* code for hamiltonian tour in T3 */
