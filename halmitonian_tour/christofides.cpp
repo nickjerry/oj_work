@@ -31,6 +31,7 @@ public:
 		e[pe].to = v;
 		e[pe].weight = w;
 		e[pe].next = head[u];
+		e[pe].vis = false;
 		head[u] = pe++;
 		degree[u]++;
 
@@ -38,12 +39,14 @@ public:
 		e[pe].to = u;
 		e[pe].weight = w;
 		e[pe].next = head[v];
+		e[pe].vis = false;
 		head[v] = pe++;
 		degree[v]++;
 	}
 
 	void print()
 	{
+
 		int i, j;
 		for(i = 0; i < MAXN; i ++)
 		{
@@ -57,6 +60,7 @@ public:
 			}
 			printf("\n");
 		}
+		printf("\n");
 	}
 };
 
@@ -70,7 +74,12 @@ int pi[MAXN];
 
 bool cmp(edge a, edge b)
 {
-	return a.weight < b.weight;
+	if(a.weight < b.weight)
+		return true;
+	else if(a.weight > b.weight)
+		return false;
+	else
+		return a.from < b.from;
 }
 
 int find_set(int s)
@@ -103,31 +112,61 @@ void make_mintree()
 /* code for perfectmatching */
 
 graph odd;
+bool is_odd[MAXN];
 
 void make_odd()
 {
 	odd.clear();
+	memset(is_odd, 0, sizeof(is_odd));
 
 	int i, j;
 	for(i = 0; i < n; i++)
 	{
-		if(mintree.head[i] == -1 || (mintree.degree[i] & 1 == 0))
+		if(mintree.head[i] == -1 || (mintree.degree[i] & 1))
+		{
+			is_odd[i] = true;
+		}
+
+	}
+
+	for(i = 0; i < n; i++)
+	{
+		if(g.head[i] == -1 || !is_odd[i])
 			continue;
 
-		for(j = mintree.head[i]; j != -1; j = mintree.e[i].next)
+		for(j = g.head[i]; j != -1; j = g.e[j].next)
 		{
-			if(mintree.degree[mintree.e[j].to] & 1)
+			if(!g.e[j].vis && is_odd[g.e[j].to])
 			{
-				odd.add(mintree.e[j].from, mintree.e[j].to, mintree.e[j].weight);
+				g.e[j].vis = true;
+				g.e[j ^ 1].vis = true;
+				odd.add(g.e[j].from, g.e[j].to, g.e[j].weight);
 			}
 		}
-		
 	}
 }
+
+bool pm_vis[MAXN];
 
 void make_perfect_match()
 {
 	make_odd();
+	printf("odd graph : \n");
+	odd.print();
+	memset(pm_vis, 0, sizeof(pm_vis));
+	sort(&odd.e[0], &odd.e[odd.pe], cmp);
+
+	int i;
+	for(i = 0; i < odd.pe; i += 2)
+	{
+		if(!pm_vis[odd.e[i].from] && !pm_vis[odd.e[i].to])
+		{
+			mintree.add(odd.e[i].from, odd.e[i].to, odd.e[i].weight);
+			pm_vis[odd.e[i].from] = true;
+			pm_vis[odd.e[i].to] = true;
+		}
+	}
+	mintree.print();
 }
 
 /* code for perfectmatching */
@@ -147,6 +186,7 @@ void euler_dfs(int s)
 		if(!mintree.e[i].vis)
 		{
 			mintree.e[i].vis = true;
+			mintree.e[i ^ 1].vis = true;
 			euler_dfs(mintree.e[i].to);
 			break;
 		}
@@ -188,6 +228,8 @@ void output_path()
 {
 	memset(vis, 0, sizeof(vis));
 
+	printf("hamiltonian path: ");
+
 	int i;
 	for(i = 0; i < pathtop; i++)
 	{
@@ -198,12 +240,15 @@ void output_path()
 		}
 	}
 
-	printf("\n");
+	printf("%d\n\n", eulerpath[0]);
 }
 
 void init()
 {
 	g.clear();
+	cg.clear();
+	mintree.clear();
+	odd.clear();
 	int i;
 	for(i = 0; i < n; i++)
 	{
@@ -218,6 +263,9 @@ int main()
 	for(iT = 0; iT < T; iT++)
 	{
 		cin >> n >> m;
+
+		init();
+
 		for(i = 0; i < m; i++)
 		{
 			cin >> u >> v >> w;
@@ -226,9 +274,17 @@ int main()
 		}
 
 		make_mintree();
+		mintree.print();
 		make_perfect_match();
 		make_euler_tour();
 		output_path();
+
+		printf("euler path: ");
+		for(i = 0; i < pathtop; i++)
+		{
+			printf("%d ", eulerpath[i]);
+		}
+		printf("\n\n");
 	}
 	return 0;
 }

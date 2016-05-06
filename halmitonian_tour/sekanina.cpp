@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <queue>
 #include <iostream>
 #include <algorithm>
 
@@ -23,6 +24,37 @@ public:
 		pe = 0;
 		memset(head, -1, sizeof(head));
 		memset(degree, 0, sizeof(degree));
+	}
+
+	void del(int u, int v)
+	{
+		int i, prev = head[u];
+		if(e[prev].to == v)
+			head[u] = e[prev].next;
+		for(i = e[prev].next; i != -1; i = e[i].next)
+		{
+			if(e[i].to == v)
+			{
+				e[prev].next = e[i].next;
+				e[i].next = -1;
+				break;
+			}
+			prev = i;
+		}
+
+		prev = head[v];
+		if(e[prev].to == u)
+			head[v] = e[prev].next;
+		for(i = e[head[v]].next; i != -1; i = e[i].next)
+		{
+			if(e[i].to == u)
+			{
+				e[prev].next = e[i].next;
+				e[i].next = -1;
+				break;
+			}
+			prev = i;
+		}
 	}
 
 	void add(int u, int v, int w)
@@ -57,12 +89,13 @@ public:
 			}
 			printf("\n");
 		}
+		printf("\n");
 	}
 };
 
 
-int n, m;
-graph g, cg, mintree;
+int n, m, adj[MAXN][MAXN];
+graph cg, mintree;
 
 /* code for generate min tree */
 
@@ -100,50 +133,88 @@ void make_mintree()
 
 /* code for generate min tree */
 
-/* code for construct T3 */
+/* code for generate brother tree */
 
-int tree3_par;
-bool tree3_vis[MAXN];
+queue<int> q;
+graph brother_tree;
+int d[MAXN];
 
-void tree3_bfs(int s, int depth)
+void brother_tree_bfs()
 {
 	int i;
-	if(depth > 3)
-		return;
-
-	for(i = mintree.head[s]; i != -1; i = mintree.e[i].next)
+	memset(d, -1, sizeof(d));
+	q.push(0);
+	d[0] = 0;
+	while(!q.empty())
 	{
-		if(!tree3_vis[mintree.e[i].to])
+		int v, oldv, u = q.front();
+		q.pop();
+		oldv = u;
+		for(i = mintree.head[u]; i != -1; i = mintree.e[i].next)
 		{
-			tree3_vis[mintree.e[i].to] = true;
-			if(depth > 0)
-				mintree.add(tree3_par, mintree.e[i].to, 1);
-			tree3_bfs(mintree.e[i].to, depth + 1);
+			v = mintree.e[i].to;
+			if(d[v] == -1)
+			{
+				d[v] = d[u] + 1;
+				q.push(v);
+				brother_tree.add(oldv, v, 1);
+				oldv = v;
+			}
 		}
 	}
 }
 
-void make_tree3()
+void make_brother_tree()
 {
-	int pt = 0, tmp[MAXN];
-	memset(tree3_vis, 0, sizeof(tree3_vis));
-
-	int i;
-	for(i = 0; i < n; i++)
-	{
-		if(mintree.head[i] == -1)
-			continue;
-
-		tree3_par = i;
-		tree3_bfs(i, 0);
-	}
+	brother_tree_bfs();
+	brother_tree.print();
 }
 
-/* code for construct T3 */
-
+/* code for generate brother tree */
 
 /* code for hamiltonian tour in T3 */
 
+graph hamilpath;
+
+void make_recursive(int s)
+{
+	if(brother_tree.head[s] == -1)
+		return;
+
+	int i, left, leftson, right = s;
+	left = leftson = brother_tree.e[brother_tree.head[s]].to;
+
+	for(i = brother_tree.head[s]; i != -1; i = brother_tree.e[i].next)
+	{
+		if(d[i] == d[left])
+		{
+			right = i;
+		}
+		if(d[i] == d[left] + 1)
+		{
+			leftson = i;
+		}
+	}
+
+	printf("[%d, %d, %d, %d] ", s, right, left, leftson);
+	return;
+	brother_tree.del(s, left);
+	brother_tree.del(left, right);
+	brother_tree.add(s, right, 1);
+	make_recursive(left);
+	make_recursive(s);
+	hamilpath.del(s, right);
+	hamilpath.del(left, leftson);
+	hamilpath.add(left, s, 1);
+	hamilpath.add(leftson, right, 1);
+}
+
+void make_hamilpath()
+{
+	make_brother_tree();
+	make_recursive(0);
+	hamilpath.print();
+}
 
 /* code for hamiltonian tour in T3 */
 
@@ -151,7 +222,10 @@ void make_tree3()
 
 void init()
 {
-	g.clear();
+	cg.clear();
+	mintree.clear();
+	brother_tree.clear();
+	memset(adj, 0, sizeof(adj));
 	int i;
 	for(i = 0; i < n; i++)
 	{
@@ -166,15 +240,19 @@ int main()
 	for(iT = 0; iT < T; iT++)
 	{
 		cin >> n >> m;
+		
+		init();
+
 		for(i = 0; i < m; i++)
 		{
 			cin >> u >> v >> w;
-			g.add(u, v, w);
+			adj[u][v] = adj[v][u] = w;
 			cg.add(u, v, w);
 		}
 
 		make_mintree();
-		make_tree3();
+		mintree.print();
+		make_hamilpath();
 	}
 	return 0;
 }
