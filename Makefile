@@ -1,8 +1,7 @@
 .PHONY: run clean asm cpp submit
 
 CC = g++
-CFILES := halmitonian_tour/sekanina.cpp
-#CFLAGS :=
+CFILES := mincut/lcomb_contract.cpp
 CFLAGS := -Wall -Werror
 
 TAR = tar.exe
