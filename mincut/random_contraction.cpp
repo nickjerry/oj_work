@@ -64,6 +64,8 @@ int main()
 		
 		for(i = 0; i < m; i++)
 		{
+			if(left <= 2)
+				break;
 			int x = e[i].u;
 			int y = e[i].v;
 			int px = find(x);
@@ -73,8 +75,6 @@ int main()
 				pi[px] = py;
 				left --;
 			}
-			if(left <= 2)
-				break;
 		}
 
 		for(i = 0; i < m; i++)

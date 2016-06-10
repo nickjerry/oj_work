@@ -11,6 +11,32 @@ using namespace std;
 #define INF 0x3f3f3f3f
 #define MAXN 9999
 #define MAXM 999999
+#define show_array_1(a, n) \
+	do \
+	{ \
+		int i; \
+		cout << "line:" << __LINE__ << ", " << #a << ":\n"; \
+		for(i = 0; i < n; i++) \
+		{ \
+			cout << a[i] << ' '; \
+		} \
+		cout << '\n'; \
+	} while(0)
+
+#define show_array_2(a, m, n) \
+	do \
+	{ \
+		int i, j; \
+		cout << "line:" << __LINE__ << ", " << #a << ":\n"; \
+		for(i = 0; i < m; i++) \
+		{ \
+			for(j = 0; j < n; j++) \
+			{ \
+				cout << a[i][j] << ' '; \
+			} \
+			cout << '\n'; \
+		} \
+	} while(0)
 
 struct edge {
 	int u, v, w;
@@ -89,6 +115,7 @@ int solve()
 	}
 	return ans;
 }
+
 void add(int u, int v, int w)
 {
 	e[pe].u = u;
@@ -138,6 +165,8 @@ int main()
 		ln = max(ln, 2);
 		for(i = 0; i < m; i++)
 		{
+			if(left <= ln)
+				break;
 			int x = e[i].u;
 			int y = e[i].v;
 			int px = find(x);
@@ -147,8 +176,11 @@ int main()
 				pi[px] = py;
 				left --;
 			}
-			if(left <= ln)
-				break;
+		}
+		if(left > ln)
+		{
+			printf("0\n");
+			continue;
 		}
 
 		/* construct new graph with ln's vertices */
@@ -174,7 +206,7 @@ int main()
 				adj[vis[pv]][vis[pu]] += w;
 			}
 		}
-		n = pe;
+		n = left;
 		printf("%d\n", solve());
 	}
 	return 0;

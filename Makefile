@@ -1,7 +1,7 @@
 .PHONY: run clean asm cpp submit
 
 CC = g++
-CFILES := mincut/lcomb_contract.cpp
+CFILES := mincut/deterministic.cpp
 CFLAGS := -Wall -Werror
 
 TAR = tar.exe
