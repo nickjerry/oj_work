@@ -10,7 +10,7 @@ using namespace std;
 
 template<typename T>
 
-#define MAXM 20000000
+#define MAXM 100000000
 
 void random_permutation(T a[], int n)
 {
@@ -34,14 +34,14 @@ int main()
 	for(iT = 0; iT < T; iT++)
 	{
 		int pe = 0;
-		n = rand() % 50 + 2;
-		m = rand() % 200 + 1;
+		n = 400;
+		m = 2000;
 		for(i = 0; i < n; i++)
 			for(j = 0; j < n; j++)
 			{
 				if(i == j)
 					continue;
-				int tc = rand() % 3 + 1;
+				int tc = (2 * m) / (n * n) + 1;
 				for(k = 0; k < tc; k++)
 				{
 					int w = rand() % 16 + 1;

@@ -14,53 +14,6 @@ using namespace std;
 #define MAXN 9999
 #define MAXM 999999
 
-#define log(...) do { \
-		printf("%s, %d:", __func__, __LINE__); \
-		printf(__VA_ARGS__); \
-	} while(0)
-
-#define show_array_1(a, n) \
-	do \
-	{ \
-		int i; \
-		cout << "line:" << __LINE__ << ", " << #a << ":\n"; \
-		for(i = 0; i < n; i++) \
-		{ \
-			printf("%2d ", a[i]); \
-		} \
-		cout << '\n'; \
-	} while(0)
-
-#define show_array_2(_a, _m, _n) \
-	do \
-	{ \
-		int _i, _j; \
-		cout << "line:" << __LINE__ << ", " << #_a << ":\n"; \
-		for(_i = 0; _i < _m; _i++) \
-		{ \
-			for(_j = 0; _j < _n; _j++) \
-			{ \
-				printf("%2d ", _a[_i][_j]);; \
-			} \
-			cout << '\n'; \
-		} \
-	} while(0)
-
-#define show_edge(_e, _m) \
-	do \
-	{ \
-		int _i; \
-		printf("size:%d\n", _m);\
-		cout << "line:" << __LINE__ << ", " << #_e << ":\n"; \
-		for(_i = 0; _i < _m; _i++) \
-		{ \
-			printf("[%2d, %2d, %2d] ", find(_e[_i].u), find(_e[_i].v), _e[_i].w); \
-			if((_i + 1) % 5 == 0) \
-				cout << '\n'; \
-		} \
-		printf("\n"); \
-	} while(0)
-
 struct edge {
 	int u, v, w;
 	edge(int x = 0, int y = -1, int z = -2){u = x; v = y; w = z;}
@@ -73,21 +26,6 @@ int pi[MAXN];
 int adj[MAXN][MAXN];
 int combine[LEFTN];
 int wet[LEFTN], vis[LEFTN];
-
-void show_vector(vector<edge> v)
-{
-	int i, n = v.size();
-	printf("size:%d\n", n);
-	for(i = 0; i < n; i++)
-	{
-		printf("[%2d, %2d, %2d] ", v[i].u, v[i].v, v[i].w);
-		if((i + 1) % 5 == 0)
-			printf("\n");
-	}
-	printf("\n\n");
-}
-
-#define show(v) do{printf("%d, %s ", __LINE__, #v);show_vector(v);}while(0)
 
 int search(int n)
 {
@@ -165,7 +103,6 @@ int find(int s)
 bool tarjan(vector<edge>& e, vector<edge> &ne, int &n)
 {
 	int i, j, pe, m = e.size();
-	ne.clear();
 
 	if(n <= 6)
 		return true;
@@ -174,12 +111,11 @@ bool tarjan(vector<edge>& e, vector<edge> &ne, int &n)
 	for(i = 0; i < n; i++)
 		pi[i] = i;
 
-	ne = e;
 	/* random permutation firstly */
 	for(i = 0; i < m; i++)
 	{
 		int j = rand() % (m - i) + i;
-		swap(ne[i], ne[j]);
+		swap(e[i], e[j]);
 	}
 	
 	/* tarjan to n / sqrt(2) vertices */
@@ -190,8 +126,8 @@ bool tarjan(vector<edge>& e, vector<edge> &ne, int &n)
 	{
 		if(left <= ln)
 			break;
-		int x = ne[i].u;
-		int y = ne[i].v;
+		int x = e[i].u;
+		int y = e[i].v;
 		int px = find(x);
 		int py = find(y);
 		if(px != py)
@@ -214,33 +150,15 @@ bool tarjan(vector<edge>& e, vector<edge> &ne, int &n)
 	for(i = 0; i < n; i++)
 		vis[i] = vis[find(i)];
 
-	for(i = 0; i < ((int)ne.size()); i++)
+	ne.clear();
+	for(i = 0; i < ((int)e.size()); i++)
 	{
-		int u = ne[i].u;
-		int v = ne[i].v;
-		int w = ne[i].w;
-
-		if(vis[u] != vis[v])
-		{
-			adj[vis[u]][vis[v]] += w;
-			adj[vis[v]][vis[u]] += w;
-		}
+		int vu = vis[e[i].u];
+		int vv = vis[e[i].v];
+		if(vu != vv)
+			ne.push_back(edge(vu, vv, e[i].w));
 	}
 
-	ne.clear();
-	for(i = 0; i < ln; i++)
-		for(j = i + 1; j < ln; j++)
-		{
-			int w = adj[i][j];
-			if(w)
-			{
-				edge tmp;
-				tmp.u = i;
-				tmp.v = j;
-				tmp.w = w;
-				ne.push_back(tmp);
-			}
-		}
 	n = ln;
 	return true;
 }

@@ -7,7 +7,7 @@
 using namespace std;
 
 #define MAXN 9999
-#define MAXM 999999
+#define MAXM 9999999
 
 struct edge {
 	int u, v, w;

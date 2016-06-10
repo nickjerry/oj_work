@@ -10,7 +10,7 @@ using namespace std;
 
 #define INF 0x3f3f3f3f
 #define MAXN 9999
-#define MAXM 999999
+#define MAXM 9999999
 #define show_array_1(a, n) \
 	do \
 	{ \

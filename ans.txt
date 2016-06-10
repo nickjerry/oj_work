@@ -1,20 +1,17 @@
 deterministic
-0
-0
-122
+13
+17
+17
 
 lcomb_contract
-0
-0
-122
+21
+17
+18
 
 random_contraction
-0
-0
-145
+37
+35
+57
 
 RRC
-0
-0
-136
 

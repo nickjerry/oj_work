@@ -1,11 +1,17 @@
 #!/bin/bash
 
+gen=mincut/gen.cpp
+
+mkdir -p obj
 rm -rf ans.txt
-g++ mincut/gen.cpp -o obj/test
+g++ $gen -o obj/test
 obj/test > tmp.txt
 
 for file in mincut/*;do
-	if [ "`basename $file`" == "gen.cpp" ];then
+	if [ "`basename $file`" == "`basename $gen`" ];then
+		continue
+	fi
+	if [ "`basename $file`" != "RRC.cpp" ];then
 		continue
 	fi
 	algorithm=`basename $file | sed 's/.cpp//g'`
