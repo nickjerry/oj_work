@@ -19,6 +19,48 @@ using namespace std;
 		printf(__VA_ARGS__); \
 	} while(0)
 
+#define show_array_1(a, n) \
+	do \
+	{ \
+		int i; \
+		cout << "line:" << __LINE__ << ", " << #a << ":\n"; \
+		for(i = 0; i < n; i++) \
+		{ \
+			printf("%2d ", a[i]); \
+		} \
+		cout << '\n'; \
+	} while(0)
+
+#define show_array_2(_a, _m, _n) \
+	do \
+	{ \
+		int _i, _j; \
+		cout << "line:" << __LINE__ << ", " << #_a << ":\n"; \
+		for(_i = 0; _i < _m; _i++) \
+		{ \
+			for(_j = 0; _j < _n; _j++) \
+			{ \
+				printf("%2d ", _a[_i][_j]);; \
+			} \
+			cout << '\n'; \
+		} \
+	} while(0)
+
+#define show_edge(_e, _m) \
+	do \
+	{ \
+		int _i; \
+		printf("size:%d\n", _m);\
+		cout << "line:" << __LINE__ << ", " << #_e << ":\n"; \
+		for(_i = 0; _i < _m; _i++) \
+		{ \
+			printf("[%2d, %2d, %2d] ", find(_e[_i].u), find(_e[_i].v), _e[_i].w); \
+			if((_i + 1) % 5 == 0) \
+				cout << '\n'; \
+		} \
+		printf("\n"); \
+	} while(0)
+
 struct edge {
 	int u, v, w;
 	edge(int x = 0, int y = -1, int z = -2){u = x; v = y; w = z;}
@@ -38,14 +80,14 @@ void show_vector(vector<edge> v)
 	printf("size:%d\n", n);
 	for(i = 0; i < n; i++)
 	{
-		printf("[%d, %d, %d] ", v[i].u, v[i].v, v[i].w);
-		if((i + 1) % 6 == 0)
+		printf("[%2d, %2d, %2d] ", v[i].u, v[i].v, v[i].w);
+		if((i + 1) % 5 == 0)
 			printf("\n");
 	}
 	printf("\n\n");
 }
 
-#define show(v) do{printf("%d ", __LINE__);show_vector(v);}while(0)
+#define show(v) do{printf("%d, %s ", __LINE__, #v);show_vector(v);}while(0)
 
 int search(int n)
 {
@@ -132,11 +174,12 @@ bool tarjan(vector<edge>& e, vector<edge> &ne, int &n)
 	for(i = 0; i < n; i++)
 		pi[i] = i;
 
+	ne = e;
 	/* random permutation firstly */
 	for(i = 0; i < m; i++)
 	{
 		int j = rand() % (m - i) + i;
-		ne.push_back(e[j]);
+		swap(ne[i], ne[j]);
 	}
 	
 	/* tarjan to n / sqrt(2) vertices */
@@ -153,7 +196,7 @@ bool tarjan(vector<edge>& e, vector<edge> &ne, int &n)
 		int py = find(y);
 		if(px != py)
 		{
-			pi[px] = py;
+			pi[px] = find(py);
 			left --;
 		}
 	}
@@ -168,23 +211,20 @@ bool tarjan(vector<edge>& e, vector<edge> &ne, int &n)
 	pe = 0;
 	memset(adj, 0, sizeof(adj));
 	memset(vis, -1, sizeof(vis));
-	for(i = 0; i < m; i++)
+	for(i = 0; i < n; i++)
+		if(vis[i] == -1)
+			vis[i] = vis[find(i)] = pe ++;
+
+	for(i = 0; i < ((int)ne.size()); i++)
 	{
-		int u = e[i].u;
-		int v = e[i].v;
-		int w = e[i].w;
+		int u = ne[i].u;
+		int v = ne[i].v;
+		int w = ne[i].w;
 
-		int pu = find(u);
-		int pv = find(v);
-
-		if(pu != pv)
+		if(vis[u] != vis[v])
 		{
-			if(vis[pu] == -1)
-				vis[pu] = pe ++;
-			if(vis[pv] == -1)
-				vis[pv] = pe ++;
-			adj[vis[pu]][vis[pv]] += w;
-			adj[vis[pv]][vis[pu]] += w;
+			adj[vis[u]][vis[v]] += w;
+			adj[vis[v]][vis[u]] += w;
 		}
 	}
 
@@ -208,6 +248,8 @@ bool tarjan(vector<edge>& e, vector<edge> &ne, int &n)
 
 int RRC(vector<edge>& v, int n)
 {
+	static int date = 0;
+	date ++;
 	if(n <= 6)
 	{
 		return solve(v, n);
@@ -218,14 +260,20 @@ int RRC(vector<edge>& v, int n)
 	int a;
 	cn = n;
 	if(tarjan(v, e, cn))
+	{
+		show(v);
 		a = RRC(e, cn);
+		show(e);
+	}
 	else
 		a = 0;
 
 	int b;
 	cn = n;
 	if(tarjan(v, e, cn))
+	{
 		b = RRC(e, cn);
+	}
 	else
 		b = 0;
 	return min(a, b);
@@ -242,7 +290,8 @@ int main()
 		for(i = 0; i < m; i++)
 		{
 			cin >> u >> v >> w;
-			edge tmp = edge(u, v, w);
+			edge tmp;
+			tmp.u = u; tmp.v = v; tmp.w = w;
 			e.push_back(tmp);
 		}
 
