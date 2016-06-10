@@ -202,18 +202,17 @@ bool tarjan(vector<edge>& e, vector<edge> &ne, int &n)
 	}
 
 	if(left > ln)
-	{
-		printf("{%d, %d} ", left, ln);
 		return false;
-	}
 
 	/* construct new graph with ln's vertices */
 	pe = 0;
 	memset(adj, 0, sizeof(adj));
 	memset(vis, -1, sizeof(vis));
 	for(i = 0; i < n; i++)
-		if(vis[i] == -1)
-			vis[i] = vis[find(i)] = pe ++;
+		if(i == find(i))
+			vis[find(i)] = pe ++;
+	for(i = 0; i < n; i++)
+		vis[i] = vis[find(i)];
 
 	for(i = 0; i < ((int)ne.size()); i++)
 	{
@@ -260,20 +259,14 @@ int RRC(vector<edge>& v, int n)
 	int a;
 	cn = n;
 	if(tarjan(v, e, cn))
-	{
-		show(v);
 		a = RRC(e, cn);
-		show(e);
-	}
 	else
 		a = 0;
 
 	int b;
 	cn = n;
 	if(tarjan(v, e, cn))
-	{
 		b = RRC(e, cn);
-	}
 	else
 		b = 0;
 	return min(a, b);

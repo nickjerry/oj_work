@@ -1,7 +1,7 @@
 .PHONY: run clean asm cpp submit
 
 CC = g++
-CFILES := mincut/RRC.cpp
+CFILES := mincut/deterministic.cpp
 CFLAGS := -Wall -Werror
 
 TAR = tar.exe
