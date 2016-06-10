@@ -34,8 +34,8 @@ int main()
 	for(iT = 0; iT < T; iT++)
 	{
 		int pe = 0;
-		n = 200;
-		m = 200;
+		n = 40;
+		m = 1600;
 		for(i = 0; i < n; i++)
 			for(j = 0; j < n; j++)
 			{
